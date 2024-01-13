@@ -22,7 +22,7 @@ def header():
     cprint(f' ⎹ Location : {os.getcwd()}', 'yellow', 'on_grey', end = '\n\n')
     
 def init_client_log(log_num, verbose = 0, stream=0):
-    log_path = f'Client/DataBase/Logs/log_client_{log_num}.log'
+    log_path = f'richsockets/Client/DataBase/Logs/log_client_{log_num}.log'
     if verbose: print(f'Client logs saved at : {log_path}')
 
     client_log = logging.getLogger('client_log')
@@ -53,7 +53,7 @@ def client_help():
     cprint('\t'+'-'*50, 'yellow')
     
 def init_server_log(verbose = 0, stream = 0):
-    log_path = 'Server/DataBase/Logs/log_server.log'
+    log_path = 'richsockets/Server/DataBase/Logs/log_server.log'
     if verbose: print(f'Server logs saved at : {log_path}')
 
     server_log = logging.getLogger('server_log')

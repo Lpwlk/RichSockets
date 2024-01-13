@@ -1,2 +1,0 @@
-08:59:47 - server_log - INFO - Server listening up to 5 clients on : ('192.168.1.12', 8000) (MainThread)
-10:09:56 - server_log - INFO - Keyboard interrupt -> server threading loop closed (MainThread)

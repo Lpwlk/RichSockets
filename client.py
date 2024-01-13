@@ -45,9 +45,9 @@ parser.add_argument('-port', '--port',
 args = parser.parse_args()
 
 
-rich.inspect(myclient.Client(args.ipserv, args.port))
-for arg in vars(args): 
-    print(arg, '\t─\t', getattr(args, arg))
+# rich.inspect(myclient.Client(args.ipserv, args.port))
+# for arg in vars(args): 
+#     print(arg, '\t─\t', getattr(args, arg))
 
 def custom_help():
     parser.print_help()

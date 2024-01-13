@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import time
 import socket
 import struct
@@ -11,9 +12,8 @@ from datetime import datetime
 from mytools import bprint, cprint
 import numpy as np
 import directory_tree as dtree
-from src.utils import *
-from rich.traceback import install
-install(show_locals=True)
+from richsockets.utils import *
+
 # import shutil
 # shutil.make_archive('test', 'zip', 'Server/DataBase')
 
@@ -125,7 +125,7 @@ class Server:
                     cprint(f' > Client {client_socket.getpeername()} exited the chat room', color)
                 if request == b'get_dbp':
                     # db_tree = dtree.display_tree(dir_path=os.getcwd(), string_rep=True, max_depth=float("inf"), show_hidden=True)
-                    db_tree = dtree.display_tree(dir_path=os.path.join(os.getcwd(),'ServerDataBase', ''), string_rep=True, max_depth=float("inf"), show_hidden=True)
+                    db_tree = dtree.display_tree(dir_path=os.path.join(os.getcwd(),'richsockets/Server/DataBase', ''), string_rep=True, max_depth=float("inf"), show_hidden=True)
                     self.send(client_socket, db_tree, color)
                 if request == b'get_sock_details':
                     sock_details = get_socket_details(client_socket, verbose = 1, color = color)

@@ -1,3 +1,5 @@
 {
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "off",
+    "explorer.excludeGitIgnore": false,
+    "explorer.fileNesting.enabled": false
 }
