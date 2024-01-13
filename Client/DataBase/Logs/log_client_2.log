@@ -1,0 +1,3 @@
+06:13:58 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
+06:13:59 - client_log - INFO - Received input : st
+06:14:04 - client_log - INFO - Client sent : stream,None,4,5,1,None

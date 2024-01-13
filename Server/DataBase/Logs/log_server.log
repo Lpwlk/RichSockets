@@ -1,0 +1,26 @@
+06:12:47 - server_log - INFO - Server listening up to 5 clients on : ('192.168.1.12', 8000) (MainThread)
+06:12:48 - server_log - INFO - New connected client : ('192.168.1.12', 53485) (MainThread)
+06:12:48 - server_log - INFO -  └── Client thread started for client ('192.168.1.12', 53485) (Thread-1 (handle_client))
+06:12:53 - server_log - INFO - Received request from ('192.168.1.12', 53485) : b'stream,None,None,None,None,None' (Thread-1 (handle_client))
+06:12:53 - server_log - ERROR - Client ('192.168.1.12', 8000) handling broken (0 clients connected now) (Thread-1 (handle_client))
+Traceback (most recent call last):
+  File "/Users/loicpwlk/Documents/Code/RichSockets/Server/richserver.py", line 162, in handle_client
+    channel, buf_len, n_packet, verbose, delay = [int(stream_specs[i]) for i in range(1, 6)]
+                                                  ^^^^^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: b'None'
+06:12:53 - server_log - INFO -  ─── Client ('192.168.1.12', 53485) thread exited after exception (invalid literal for int() with base 10: b'None') with code : 0 (Thread-1 (handle_client))
+06:13:58 - server_log - INFO - New connected client : ('192.168.1.12', 53486) (MainThread)
+06:13:58 - server_log - INFO -  └── Client thread started for client ('192.168.1.12', 53486) (Thread-2 (handle_client))
+06:14:04 - server_log - INFO - Received request from ('192.168.1.12', 53486) : b'stream,None,4,5,1,None' (Thread-2 (handle_client))
+06:14:04 - server_log - ERROR - Client ('192.168.1.12', 8000) handling broken (0 clients connected now) (Thread-2 (handle_client))
+Traceback (most recent call last):
+  File "/Users/loicpwlk/Documents/Code/RichSockets/Server/richserver.py", line 162, in handle_client
+    channel, buf_len, n_packet, verbose, delay = [int(stream_specs[i]) for i in range(1, 6)]
+                                                  ^^^^^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: b'None'
+06:14:04 - server_log - INFO -  ─── Client ('192.168.1.12', 53486) thread exited after exception (invalid literal for int() with base 10: b'None') with code : 0 (Thread-2 (handle_client))
+06:15:37 - server_log - INFO - New connected client : ('192.168.1.12', 53499) (MainThread)
+06:15:37 - server_log - INFO -  └── Client thread started for client ('192.168.1.12', 53499) (Thread-3 (handle_client))
+06:15:38 - server_log - INFO - Received request from ('192.168.1.12', 53499) : b'' (Thread-3 (handle_client))
+06:15:38 - server_log - INFO - Client ('192.168.1.12', 53499) disconnected from server (0 clients connected now) (Thread-3 (handle_client))
+06:15:38 - server_log - INFO -  ─── Client ('192.168.1.12', 53499) thread exited after disconnect request with code : 0 (Thread-3 (handle_client))
