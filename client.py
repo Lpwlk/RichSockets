@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-from Client import richclient as myclient
+from richsockets.Client import richclient as myclient
 import argparse
 import rich
 from mytools import cprint
+
 
 parser = argparse.ArgumentParser(
     formatter_class = argparse.RawDescriptionHelpFormatter,

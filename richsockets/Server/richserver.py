@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
 import os
-import sys
 import time
 import socket
 import struct
-import logging
 import hashlib
 import threading
-import platform
-import mactemperatures
 from tqdm import tqdm
 from datetime import datetime
 from mytools import bprint, cprint
 import numpy as np
 import directory_tree as dtree
 from src.utils import *
+from rich.traceback import install
+install(show_locals=True)
 # import shutil
 # shutil.make_archive('test', 'zip', 'Server/DataBase')
 

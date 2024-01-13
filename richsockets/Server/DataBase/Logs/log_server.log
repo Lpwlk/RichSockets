@@ -1,0 +1,7 @@
+07:24:40 - server_log - INFO - Server listening up to 5 clients on : ('192.168.1.12', 8000) (MainThread)
+07:24:42 - server_log - INFO - New connected client : ('192.168.1.12', 54030) (MainThread)
+07:24:42 - server_log - INFO -  └── Client thread started for client ('192.168.1.12', 54030) (Thread-1 (handle_client))
+07:24:43 - server_log - INFO - Received request from ('192.168.1.12', 54030) : b'' (Thread-1 (handle_client))
+07:24:43 - server_log - INFO - Client ('192.168.1.12', 54030) disconnected from server (0 clients connected now) (Thread-1 (handle_client))
+07:24:43 - server_log - INFO -  ─── Client ('192.168.1.12', 54030) thread exited after disconnect request with code : 0 (Thread-1 (handle_client))
+08:33:16 - server_log - INFO - Keyboard interrupt -> server threading loop closed (MainThread)

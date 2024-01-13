@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import Server.richserver as myserv
+from richsockets.Server import richserver as myserv
 import rich
 
 rich.inspect(myserv.Server(myserv.get_dev_ip(), 8000))
