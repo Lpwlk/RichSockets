@@ -18,21 +18,15 @@ pip install richsockets
 # Usage
 
 From pckg repository, examples are available. More basic & auto-runned examples comming ...
-
 - Term 1 (Server)
-
 ```
 python3 server.py
 ```
-
 #
-
 - Term 2 (Client)
-
 ```
 python3 client.py
 ```
-
 
 # Dependencies
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-from richsockets.Server import richserver as serv
-from rich import print, inspect
+from richsockets.Server import richserver as rc
+from richsockets.Server.richserver import print, inspect, console
+rc.header()
+
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -33,7 +35,7 @@ parser.add_argument('-p', '--path',
                     help = 'Path to be passed to tree tests')
 
 parser.add_argument('-ip', '--ipserv', 
-                    default = serv.get_dev_ip(), 
+                    default = rc.get_dev_ip(), 
                     type = str, 
                     metavar = '',
                     action= 'store',
@@ -47,15 +49,13 @@ parser.add_argument('-port', '--port',
                     help = 'Server port num to target')
 
 args = parser.parse_args()
-# parser.print_help()
 for arg in vars(args): print(arg, '\t─\t', getattr(args, arg))
+# parser.print_help()
 
-
-inspect(serv.Server(serv.get_dev_ip(), 8000))
 
 if __name__ == '__main__':
 
-    serv.header()
+    rc.server_help()
 
-    server = serv.Server(serv.get_dev_ip(), 8000)
+    server = rc.Server(args.ipserv, args.port)
     server.serve(5)

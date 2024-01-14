@@ -7,52 +7,138 @@ import platform
 import mactemperatures
 from datetime import datetime
 import numpy as np
-from mytools import bprint, cprint
+from rich import print, inspect
+import rich.rule as rule
+import rich.table as table
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
-# import shutil
-# shutil.make_archive('test', 'zip', 'ServerDataBase')
+
+console = Console(highlighter = None)
 
 def header():
-    cprint(' '+'-'*60, 'yellow')
-    cprint(f' ⎹ > Python script execution init ...', 'yellow')
-    cprint(f' ⎹ Node_name : {platform.uname().node} (OS {platform.uname().system})', 'yellow')
-    cprint(f' ⎹ Sys.argv : {sys.argv}', 'yellow')
-    cprint(f' ⎹ Location : {os.getcwd()}', 'yellow', end = '\n\n')
-    
+    console.print(rule.Rule(style = 'white'))
+    header = table.Table(
+        title="> Python script execution init ...",
+        title_justify = "left",
+        border_style="white",
+        min_width = 60,
+        expand=True
+        )
+    header.add_column("Variable", style="yellow", header_style="bold yellow")
+    header.add_column("Variable states", style="italic yellow", header_style="bold yellow")
+    header.add_row("node.name",  f'{platform.uname().node} (OS {platform.uname().system}')
+    header.add_row("sys.argv",   f'{repr(sys.argv)}')
+    header.add_row("sys.path",   f'{sys.path[0]}')
+    console.print(header)
+
+def get_dev_ip(verbose: bool = False):
+    ip = socket.gethostbyname(socket.gethostname())
+    if verbose : 
+        console.print(f'{socket.gethostbyname(socket.gethostname())=}')
+        console.print(f'{socket.gethostname()=}')
+    return ip
+
+def process(delay: float = 1, res: int = 1000):
+    with Progress(
+        SpinnerColumn(), 
+        *Progress.get_default_columns(), 
+        TimeElapsedColumn(),
+        console=console,
+        transient=False, 
+        ) as progress:
+        start_time = progress.get_time()
+        task1 = progress.add_task("Process 1", total=res)
+        task2 = progress.add_task("Process 2", total=res)
+        task3 = progress.add_task("Process 3", total=None)
+        while not progress.finished:
+            progress.update(task1, advance=1)
+            progress.update(task2, advance=1)
+            time.sleep(delay/res)
+            if progress.get_time() - start_time > delay:
+                print('test')
+                progress.update(task3, completed = True)
+        #     progress.update(task1)
+        #     time.sleep(delay/res)
+
+
+def get_client_details(tcp_socket = socket.socket, detailed: bool = False, verbose: bool = True,):
+    socket_info = {
+        'Remote Address  '  : tcp_socket.getpeername() if tcp_socket.getpeername() else 'Not connected',
+        'Local Address   '  : tcp_socket.getsockname(),
+        'Socket Family   '  : socket.AddressFamily(tcp_socket.family).name,
+        'Socket TypeName '  : socket.SocketKind(tcp_socket.type).name,
+        'Blocking Mode   '  : '(Blocking)' if tcp_socket.gettimeout() else '(Non-blocking)',
+        'Socket Protocol '  : tcp_socket.proto,
+        'Socket FTypeName'  : f'{socket.AddressFamily(tcp_socket.family).name} ⎥ {socket.SocketKind(tcp_socket.type).name}' + (' (Blocking)' if tcp_socket.gettimeout() else ' (Non-blocking)'),
+        'Socket Hostname '  : socket.gethostname()
+    }
+    keys = list(socket_info)
+    if verbose:
+        for key in keys: 
+            console.print(f'{key} {str(socket_info[key])}')
+    return None
+
+###############################################################
+############### Client side rich-based routines ###############
+###############################################################
+
+def client_help():
+    console.print(rule.Rule(style = 'white'), width = 80)
+    help = table.Table(
+        title=" > [underline]Client help utility[\] : every available client commands are indexed here",
+        title_justify = "left",
+        border_style="white",
+        min_width = 80,
+        )
+    help.add_column("Command", style="yellow", header_style="bold yellow")
+    help.add_column("Associated client methods description", style="yellow", header_style="bold yellow")
+    help.add_column("Dev state", style="italic")
+    help.add_row("'h'",    "Display client-side help",             "dev_state")
+    help.add_row("'p'",    "Ping server thread",                   "dev_state")
+    help.add_row("'t'",    "Get server CPU temp",                  "dev_state")
+    help.add_row("'sd'",   "Get socket details from server",       "dev_state")
+    help.add_row("'sf'",   "Get socket details from server",       "dev_state")
+    help.add_row("'st'",   "Send file to server database",         "dev_state")
+    help.add_row("'cl'",   "Close current client socket",          "dev_state")
+    help.add_row("'co'",   "Open new client socket",               "dev_state")
+    help.add_row("'b'",    "Broadcast data to available clients",  "dev_state")
+    console.print(help)
+
 def init_client_log(log_num, verbose = 0, stream=0):
     log_path = f'richsockets/Client/DataBase/Logs/log_client_{log_num}.log'
-    if verbose: print(f'Client logs saved at : {log_path}')
-
+    if verbose: console.print(f'Client logs saved at : {log_path}')
     client_log = logging.getLogger('client_log')
     client_fileHandler = logging.FileHandler(filename = log_path, mode = 'w'); streamHandler = logging.StreamHandler()
     client_log.setLevel(logging.DEBUG); client_fileHandler.setLevel(logging.DEBUG); streamHandler.setLevel(logging.DEBUG)
-
     fmt = logging.Formatter(fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt = '%I:%M:%S')
     client_fileHandler.setFormatter(fmt); streamHandler.setFormatter(fmt)
-
     client_log.addHandler(client_fileHandler)
     if stream: client_log.addHandler(streamHandler)
     return client_log, log_path
 
-def client_help():
-    cprint('\t'+'-'*70, 'yellow')
-    cprint('\t> Client CLI help utility display, any command described here can be\n\tused to interract with the client via simple CLI command prompts ...', 'yellow')
-    cprint('\t'+'-'*50, 'yellow')
-    cprint('\t⎹ p :\tPing server thread', 'light_yellow')
-    cprint('\t⎹ t :\tGet server CPU temp', 'light_yellow')
-    cprint('\t⎹ b :\tBroadcast data to available clients', 'light_yellow')
-    cprint('\t⎹ sd :\tGet socket details from server', 'light_yellow')
-    cprint('\t⎹ sf :\tSend file to server database', 'light_yellow')
-    cprint('\t⎹ st :\tSend data streaming request', 'light_yellow')
-    cprint('\t⎹ db :\tGet database path from server', 'light_yellow')
-    cprint('\t⎹ cl :\tClose current client socket', 'light_yellow')
-    cprint('\t⎹ op :\tOpen new client socket', 'light_yellow')
-    cprint('\t⎹ ch :\tDisplay client help', 'light_yellow')
-    cprint('\t'+'-'*50, 'yellow')
+###############################################################
+############### Server side rich-based routines ###############
+###############################################################
+
+def server_help():
+    console.print(rule.Rule(style = 'white'), width = 80)
+    help = table.Table(
+        title=" > Server help utility: every available server commands are indexed here",
+        title_justify = "left",
+        border_style="white",
+        min_width = 80,
+        )
+    help.add_column("Command", style="yellow", header_style="bold yellow")
+    help.add_column("Associated server methods description", style="yellow", header_style="bold yellow")
+    help.add_column("Dev state", style="italic")
+    help.add_row("'h'",    "Display server-side help",             "dev_state")
+    help.add_row("'p'",    "Ping server thread",                   "dev_state")
+    console.print(help)
     
 def init_server_log(verbose = 0, stream = 0):
     log_path = 'richsockets/Server/DataBase/Logs/log_server.log'
-    if verbose: print(f'Server logs saved at : {log_path}')
+    if verbose: console.print(f'Server logs saved at : {log_path}')
 
     server_log = logging.getLogger('server_log')
     server_fileHandler = logging.FileHandler(filename = log_path, mode = 'w'); streamHandler = logging.StreamHandler()
@@ -65,22 +151,6 @@ def init_server_log(verbose = 0, stream = 0):
     if stream: server_log.addHandler(streamHandler)
     return server_log
 
-def server_help():
-    cprint('\t'+'-'*50, 'yellow')
-    cprint('\t> Server CLI help utility display, any command\n\tdescribed here can be used to interract with\n\tthe server via simple CLI command prompts ...', 'yellow')
-    cprint('\t'+'-'*50, 'yellow')
-    cprint('\t⎹ h : Display server help', 'yellow')
-    cprint('\t⎹ s : Start server ', 'yellow')
-    cprint('\t'+'-'*50, 'yellow')
-    
-
-def get_dev_ip(verbose = 0):
-    ip = socket.gethostbyname(socket.gethostname())
-    if verbose : 
-        print(f'\t{socket.gethostbyname(socket.gethostname())=}')
-        print(f'\t{socket.gethostname()=}')
-    return ip
-
 def get_cpu_temp():
     opsystem = platform.system()
     if opsystem == "Linux": 
@@ -88,241 +158,3 @@ def get_cpu_temp():
             return float(file.read().strip()) / 1000.0
     elif opsystem == "Darwin": 
         return float(mactemperatures.get_thermal_readings()['PMU tdie1'])
-    
-def get_socket_details(tcp_socket, color, clientID = hex(0), verbose = 0, detailed = 0):
-    socket_info = {
-        'Remote Address'    : tcp_socket.getpeername() if tcp_socket.getpeername() else 'Not connected',
-        'Local Address '     : tcp_socket.getsockname(),
-        'Socket Family '     : socket.AddressFamily(tcp_socket.family).name,
-        'Socket TypeName'   : socket.SocketKind(tcp_socket.type).name,
-        'Blocking Mode '     : '(Blocking)' if tcp_socket.gettimeout() else '(Non-blocking)',
-        'Socket Protocol'   : tcp_socket.proto,
-        'Socket FTypeName'   : f'{socket.AddressFamily(tcp_socket.family).name} ⎥ {socket.SocketKind(tcp_socket.type).name}' + (' (Blocking)' if tcp_socket.gettimeout() else ' (Non-blocking)'),
-        'Socket Hostname'   : socket.gethostname()
-    }
-    
-    info_str = ''
-    for key, value in socket_info.items():
-        if detailed:
-            if key == 'Socket FTypeName': pass
-            else: info_str += f'\t⎹ {key}\t->\t{value}\n'
-        else: 
-            if key == 'Socket Family ' or key == 'Socket TypeName' or key == 'Blocking Mode ' or key == 'Socket Protocol': pass
-            else: info_str += f'\t⎹ {key}\t->\t{value}\n'
-    if verbose:
-        now = datetime.now()
-        bprint([f'{now.strftime("%m/%d/%y - %H:%M:%S")}', 'Client socket details', f'16-bit ID: {clientID}'], color = color, box_color = color, width = 21, size = (1, 3))
-        cprint(info_str, color)
-    return info_str
-from rich.console import Group
-from rich.panel import Panel
-from rich.align import Align
-from rich.layout import Layout
-from rich import layout
-from rich import print, inspect
-import rich
-
-#### Client side rich-based routines
-
-
-
-
-
-
-#### Server side rich-based routines
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# grp = Group(
-#     Align(Panel("Hello", style="bold blue", expand = False, ), align='center'),
-#     Align(Panel("World", style="italic red"), align='center')
-# )
-
-# print(Align(Panel(grp), align='center'))
-
-# """
-# Demonstrates a Rich "application" using the Layout and Live classes.
-
-# """
-
-# from datetime import datetime
-
-# from rich import box
-# from rich.align import Align
-# from rich.console import Console, Group
-# from rich.layout import Layout
-# from rich.panel import Panel
-# from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
-# from rich.syntax import Syntax
-# from rich.table import Table
-
-# console = Console()
-
-# def make_layout() -> Layout:
-#     """Define the layout."""
-#     layout = Layout(name="root")
-
-#     layout.split(
-#         Layout(name="header", size=3),
-#         Layout(name="main", ratio=1),
-#         Layout(name="footer", size=7),
-#     )
-#     layout["main"].split_row(
-#         Layout(name="side", ratio=2),
-#         Layout(name="body", ratio=3, minimum_size=50),
-#     )
-#     layout["side"].split(Layout(name="box1"), Layout(name="box2"))
-#     return layout
-
-
-# def make_sponsor_message() -> Panel:
-#     """Some example content."""
-#     sponsor_message = Table.grid(padding=1)
-#     sponsor_message.add_column(style="green", justify="right")
-#     sponsor_message.add_column(no_wrap=True)
-#     sponsor_message.add_row(
-#         "Twitter",
-#         "[u blue link=https://twitter.com/textualize]https://twitter.com/textualize",
-#     )
-#     sponsor_message.add_row(
-#         "CEO",
-#         "[u blue link=https://twitter.com/willmcgugan]https://twitter.com/willmcgugan",
-#     )
-#     sponsor_message.add_row(
-#         "Textualize", "[u blue link=https://www.textualize.io]https://www.textualize.io"
-#     )
-
-#     message = Table.grid(padding=1)
-#     message.add_column()
-#     message.add_column(no_wrap=True)
-#     message.add_row(sponsor_message)
-
-#     message_panel = Panel(
-#         Align.center(
-#             Group("\n", Align.center(sponsor_message)),
-#             vertical="middle",
-#         ),
-#         box=box.ROUNDED,
-#         padding=(1, 2),
-#         title="[b red]Thanks for trying out Rich!",
-#         border_style="bright_blue",
-#     )
-#     return message_panel
-
-
-# class Header:
-#     """Display header with clock."""
-
-#     def __rich__(self) -> Panel:
-#         grid = Table.grid(expand=True)
-#         grid.add_column(justify="center", ratio=1)
-#         grid.add_column(justify="right")
-#         grid.add_row(
-#             "[b]Rich[/b] Layout application",
-#             datetime.now().ctime().replace(":", "[blink]:[/]"),
-#         )
-#         return Panel(grid, style="white on blue")
-
-
-# def make_syntax() -> Syntax:
-#     code = """\
-# def ratio_resolve(total: int, edges: List[Edge]) -> List[int]:
-#     sizes = [(edge.size or None) for edge in edges]
-
-#     # While any edges haven't been calculated
-#     while any(size is None for size in sizes):
-#         # Get flexible edges and index to map these back on to sizes list
-#         flexible_edges = [
-#             (index, edge)
-#             for index, (size, edge) in enumerate(zip(sizes, edges))
-#             if size is None
-#         ]
-#         # Remaining space in total
-#         remaining = total - sum(size or 0 for size in sizes)
-#         if remaining <= 0:
-#             # No room for flexible edges
-#             sizes[:] = [(size or 0) for size in sizes]
-#             break
-#         # Calculate number of characters in a ratio portion
-#         portion = remaining / sum((edge.ratio or 1) for _, edge in flexible_edges)
-
-#         # If any edges will be less than their minimum, replace size with the minimum
-#         for index, edge in flexible_edges:
-#             if portion * edge.ratio <= edge.minimum_size:
-#                 sizes[index] = edge.minimum_size
-#                 break
-#         else:
-#             # Distribute flexible space and compensate for rounding error
-#             # Since edge sizes can only be integers we need to add the remainder
-#             # to the following line
-#             _modf = modf
-#             remainder = 0.0
-#             for index, edge in flexible_edges:
-#                 remainder, size = _modf(portion * edge.ratio + remainder)
-#                 sizes[index] = int(size)
-#             break
-#     # Sizes now contains integers only
-#     return cast(List[int], sizes)
-#     """
-#     syntax = Syntax(code, "python", line_numbers=True)
-#     return syntax
-
-
-# job_progress = Progress(
-#     "{task.description}",
-#     SpinnerColumn(),
-#     BarColumn(),
-#     TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-# )
-# job_progress.add_task("[green]Cooking")
-# job_progress.add_task("[magenta]Baking", total=200)
-# job_progress.add_task("[cyan]Mixing", total=400)
-
-# total = sum(task.total for task in job_progress.tasks)
-# overall_progress = Progress()
-# overall_task = overall_progress.add_task("All Jobs", total=int(total))
-
-# progress_table = Table.grid(expand=True)
-# progress_table.add_row(
-#     Panel(
-#         overall_progress,
-#         title="Overall Progress",
-#         border_style="green",
-#         padding=(2, 2),
-#     ),
-#     Panel(job_progress, title="[b]Jobs", border_style="red", padding=(1, 2)),
-# )
-
-
-# layout = make_layout()
-# layout["header"].update(Header())
-# layout["body"].update(make_sponsor_message())
-# layout["box2"].update(Panel(make_syntax(), border_style="green"))
-# layout["box1"].update(Panel(layout.tree, border_style="red"))
-# layout["footer"].update(progress_table)
-
-
-# from time import sleep
-
-# from rich.live import Live
-
-# with Live(layout, refresh_per_second=10, screen=True):
-#     while not overall_progress.finished:
-#         sleep(0.1)
-#         for job in job_progress.tasks:
-#             if not job.finished:
-#                 job_progress.advance(job.id)
-                
-#         completed = sum(task.completed for task in job_progress.tasks)
-#         overall_progress.update(overall_task, completed=completed)

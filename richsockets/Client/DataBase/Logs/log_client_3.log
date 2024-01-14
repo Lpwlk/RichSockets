@@ -1,3 +1,5 @@
-01:33:04 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
-01:33:05 - client_log - INFO - Client socket closing after sending disconnect request.
-01:33:05 - client_log - INFO - Client sent : disconnect
+12:46:25 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
+12:46:25 - client_log - INFO - Client object received input command : r
+12:46:25 - client_log - ERROR - Unknown user input in client command loop
+12:46:29 - client_log - INFO - Client socket closing after sending disconnect request.
+12:46:29 - client_log - INFO - Client sent : disconnect
