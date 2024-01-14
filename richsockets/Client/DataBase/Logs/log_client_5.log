@@ -1,5 +1,2 @@
-10:47:00 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
-10:47:01 - client_log - INFO - Received input : st
-10:47:01 - client_log - INFO - Client sent : stream,3,4,0,1,200
-10:47:11 - client_log - INFO - Client sent : stop_streaming
-10:49:12 - client_log - INFO - Client socket closing after sending disconnect request.
+01:34:04 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
+02:09:22 - client_log - INFO - Client socket closing after sending disconnect request.

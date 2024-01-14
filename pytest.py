@@ -1,88 +1,89 @@
-import time
-from mytools import *
-import numpy as np
-import argparse
-import rich
-from rich.columns import Columns
+# import time
+# from mytools import *
+# import numpy as np
+# import argparse
+# import rich
+# from rich.columns import Columns
 
-parser = argparse.ArgumentParser(
-   formatter_class=argparse.RawDescriptionHelpFormatter,
-   description="Python3 test utility for MyServer project developement",
-   epilog='Author : Pawlicki Loïc'
-   )
-parser.add_argument('-d', '--delay', 
-   default = 0.05, type = float, metavar = '',
-   action= 'store', help = '\tDelay to be passed to value print loop')
+# parser = argparse.ArgumentParser(
+#    formatter_class=argparse.RawDescriptionHelpFormatter,
+#    description="Python3 test utility for MyServer project developement",
+#    epilog='Author : Pawlicki Loïc'
+#    )
+# parser.add_argument('-d', '--delay', 
+#    default = 0.05, type = float, metavar = '',
+#    action= 'store', help = '\tDelay to be passed to value print loop')
 
-parser.add_argument('-m', '--mod_bit', 
-   default = 3, type = int, metavar = '',
-   action= 'store', help = '\tDelay to be passed to fake_process')
+# parser.add_argument('-m', '--mod_bit', 
+#    default = 3, type = int, metavar = '',
+#    action= 'store', help = '\tDelay to be passed to fake_process')
 
-parser.add_argument('-i', '--iterations', 
-   default = 32, type = int, metavar = '',
-   action= 'store', help = '\tDelay to be passed to fake_process')
+# parser.add_argument('-i', '--iterations', 
+#    default = 32, type = int, metavar = '',
+#    action= 'store', help = '\tDelay to be passed to fake_process')
 
-# rich.inspect(rich)
+# # rich.inspect(rich)
 
-console = rich.console.Console()
-args = parser.parse_args()
-argstable = rich.table.Table()
-rich.align.Align.center(argstable)
+# args = parser.parse_args()
+# argstable = rich.table.Table()
 
-argstable.add_column('Args'.center(16))
-for arg in vars(args): 
-   argstable.add_row(arg, f'{getattr(args, arg)}')
+# console = rich.console.Console()
+# rich.align.Align.center(argstable)
 
-panel = rich.panel.Panel.fit(
-    Columns([argstable, argstable]),
-    title="My Panel",
-    border_style="red",
-    title_align="left",
-    padding=(1, 2),
-)
+# argstable.add_column('Args'.center(16))
+# for arg in vars(args): 
+#    argstable.add_row(arg, f'{getattr(args, arg)}')
 
-console.print(panel)
-import rich.live
-print(rich.__file__)
-# rich.print(Panel("Hello, [red]World!"))
-# parser.print_help()
+# panel = rich.panel.Panel.fit(
+#     Columns([argstable, argstable]),
+#     title="My Panel",
+#     border_style="red",
+#     title_align="left",
+#     padding=(1, 2),
+# )
 
-value = 0
-increment = 2**0
-mod = 2**(args.mod_bit-1)
+# console.print(panel)
+# import rich.live
+# print(rich.__file__)
+# # rich.print(Panel("Hello, [red]World!"))
+# # parser.print_help()
+
+# value = 0
+# increment = 2**0
+# mod = 2**(args.mod_bit-1)
 
 
-def update_table(table: rich.table.Table = rich.table.Table(), value = 0) -> rich.table.Table:
-   """Make a new table."""
-   table.add_row(
-      f'Dec: {value}',f'Hex: {hex(value)}',f'Bin: {bin(value)}'
-   )
-   return rich.align.Align.center(table)
+# def update_table(table: rich.table.Table = rich.table.Table(), value = 0) -> rich.table.Table:
+#    """Make a new table."""
+#    table.add_row(
+#       f'Dec: {value}',f'Hex: {hex(value)}',f'Bin: {bin(value)}'
+#    )
+#    return rich.align.Align.center(table)
 
-table = rich.table.Table()
-rich.align.Align.center(table)
-table.add_column("Decimal")
-table.add_column("Hexa")
-table.add_column("Binary")
+# table = rich.table.Table()
+# rich.align.Align.center(table)
+# table.add_column("Decimal")
+# table.add_column("Hexa")
+# table.add_column("Binary")
 
-with rich.live.Live(rich.align.Align.center(update_table(table, value)), 
-                     refresh_per_second=1/args.delay, 
-                     transient=False) as live:
-   try:
-      while value < args.iterations:
-         time.sleep(args.delay)
-         value += increment
+# with rich.live.Live(rich.align.Align.center(update_table(table, value)), 
+#                      refresh_per_second=1/args.delay, 
+#                      transient=False) as live:
+#    try:
+#       while value < args.iterations:
+#          time.sleep(args.delay)
+#          value += increment
 
-         if value % mod == 0:
+#          if value % mod == 0:
 
-            live.update(update_table(table, value))
-            # cprint(f'Dec : {value};  \tBin : {bin(value)};  \tHex : {hex(value)};  \tLog10 : {np.log10(value)}', 'blue')
+#             live.update(update_table(table, value))
+#             # cprint(f'Dec : {value};  \tBin : {bin(value)};  \tHex : {hex(value)};  \tLog10 : {np.log10(value)}', 'blue')
 
-         if value == (2**63)-1: 
-            time.sleep(.5)
-      time.sleep(1)
-   except KeyboardInterrupt:
-      print('\n\nDone ...\n')
+#          if value == (2**63)-1: 
+#             time.sleep(.5)
+#       time.sleep(1)
+#    except KeyboardInterrupt:
+#       print('\n\nDone ...\n')
 
 
 
@@ -117,15 +118,15 @@ from rich.text import Text
 from rich.progress import Progress
 from rich.table import Table
 from rich.markdown import Markdown
-
-
+from rich.live import Live
+from rich import inspect
 # Colored Text
-console = Console()
+console = Console(record=True, width=70)
 console.print("[bold green]Hello, World![/bold green]")
 
 # Styled Text
-console = Console()
-styled_text = Text("Hello, World!").style("bold underline italic")
+styled_text = Text("Hello, World!", style = 'bold italic red')
+# inspect(styled_text, methods = True)
 console.print(styled_text)
 
 # Progress Bar
@@ -136,22 +137,19 @@ with Progress() as progress:
         # Your processing logic here
 
 # Table Display
-console = Console()
 table = Table(show_header=True, header_style="bold magenta")
 table.add_column("Name", style="bold cyan", width=12)
 table.add_column("Age", style="bold cyan", width=8)
-table.add_row("John Doe", 30)
-table.add_row("Jane Smith", 25)
+table.add_row("John Doe", '30')
+table.add_row("Jane Smith", '25')
 console.print(table)
 
 # Syntax Highlighting
-console = Console()
 code = "def hello():\n    print('Hello, Rich!')"
 console.print("[bold yellow]Python Code:[/bold yellow]\n")
-console.print(code, language="python", style="bold")
+console.print(code, style="bold")
 
 # Markdown Rendering
-console = Console()
 markdown_text = """
 # Rich Module
 
@@ -159,9 +157,23 @@ markdown_text = """
 
 - Supports various text styles
 - Tables, progress bars, syntax highlighting, etc.
+
 """
 console.print(Markdown(markdown_text))
 
 # Link Formatting
-console = Console()
 console.print("Check out the [link=https://github.com/willmcgugan/rich]Rich GitHub[/link] for more information.")
+
+table = Table("Name", "Styling")
+from rich.default_styles import DEFAULT_STYLES
+
+for style_name, style in DEFAULT_STYLES.items():
+   table.add_row(Text(style_name, style=style), str(style))
+console.print(table)
+
+inspect(Console, methods = True)
+inspect(Text, methods = True)
+inspect(Markdown, methods = True)
+inspect(Progress, methods = True)
+inspect(Live, methods = True)
+inspect(Table, methods = True)

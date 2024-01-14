@@ -1,19 +1,12 @@
 #!/usr/bin/env python3
 
-import os
-import sys
-import time
-import socket
-import struct
-import hashlib
-import threading
-from tqdm import tqdm
-from datetime import datetime
-from mytools import bprint, cprint
-import numpy as np
-import directory_tree as dtree
 from richsockets.utils import *
+import struct
+import threading
+import hashlib
 
+# import directory_tree as dtree
+# db_tree = print(dtree.display_tree(dir_path=os.getcwd(), string_rep=True, max_depth=float("inf"), show_hidden=False))
 # import shutil
 # shutil.make_archive('test', 'zip', 'Server/DataBase')
 
@@ -49,6 +42,7 @@ class Server:
                 client_thread = threading.Thread(target = self.handle_client, args = (client_socket, color, clientID))
                 cprint(f' └── Client thread {client_thread.name} started at {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}', 'green')
                 client_thread.start()
+                rich.inspect(self)
 
             except KeyboardInterrupt:
                 cprint('\t\nKeyboard interrupt -> server threader closed', 'red')
@@ -112,10 +106,12 @@ class Server:
         while True:
             try:
                 request = self.get_request(client_socket, color)
+                
                 if request == b'server_temp':
                     temp = get_cpu_temp()
                     self.send(client_socket, temp, color)
-                if request == b'broadcast':
+                    
+                elif request == b'broadcast':
                     cprint(f' > Client {client_socket.getsockname()} entered the chat room', color)
                     broadcasted_data = client_socket.recv(1024)
                     while broadcasted_data != b'q':
@@ -123,24 +119,28 @@ class Server:
                         broadcasted_data = client_socket.recv(1024)
                         print(broadcasted_data)
                     cprint(f' > Client {client_socket.getpeername()} exited the chat room', color)
-                if request == b'get_dbp':
+                    
+                elif request == b'get_dbp':
                     # db_tree = dtree.display_tree(dir_path=os.getcwd(), string_rep=True, max_depth=float("inf"), show_hidden=True)
                     db_tree = dtree.display_tree(dir_path=os.path.join(os.getcwd(),'richsockets/Server/DataBase', ''), string_rep=True, max_depth=float("inf"), show_hidden=True)
                     self.send(client_socket, db_tree, color)
-                if request == b'get_sock_details':
+                    
+                elif request == b'get_sock_details':
                     sock_details = get_socket_details(client_socket, verbose = 1, color = color)
                     client_socket.send(sock_details.encode())
 
-                if request == b'get_pong':
+                elif request == b'get_pong':
                     self.send(client_socket, 'pong', color)
-                if request == b'disconnect' or request == b'':
+                    
+                elif request == b'disconnect' or request == b'':
                     self.clients.remove(client_socket)
                     cprint(f'Client {client_socket.getpeername()} disconnected from server ({len(self.clients)} clients connected now)', 'red')
                     self.log.info(f'Client {client_socket.getpeername()} disconnected from server ({len(self.clients)} clients connected now)')
                     self.log.info(f' ─── Client {client_socket.getpeername()} thread exited after disconnect request with code : 0')
                     client_socket.close()
                     break
-                if request.startswith(b'download'):
+                
+                elif request.startswith(b'download'):
                     dwnld_specs = request.split(b',')
                     filesize, buf_len, dwn_path = int(dwnld_specs[1]), int(dwnld_specs[2]), 'ServerDataBase/Downloads/'+dwnld_specs[3].decode()
                     progress = tqdm(range(filesize), f"Receiving file @ {dwn_path[14:]}", unit="B", unit_scale=True, unit_divisor=1024, colour = 'blue', dynamic_ncols = True)
@@ -155,7 +155,7 @@ class Server:
                     recv_content = open(dwn_path, 'rb').read()
                     self.send_sha(client_socket, recv_content, color)
                 
-                if request.startswith(b'stream'):
+                elif request.startswith(b'stream'):
                     stream_specs = request.split(b',')
                     channel, buf_len, n_packet, verbose, delay = [int(stream_specs[i]) for i in range(1, 6)]
                     stream_cnt = 0
@@ -174,7 +174,9 @@ class Server:
 
                     cprint(f'Data streaming on channel n°{channel} closed, {stream_cnt} packets have been sent to {client_socket.getpeername()}', color)
                     cprint(f'Elapsed time in server streaming loop : {round((time.time()-t_start), 6)} s', color)
-
+                else:
+                    print('Unknown request')
+                    pass
             except Exception as e:
                 self.clients.remove(client_socket)
                 cprint(f'Client {client_socket.getsockname()} handling broken : {e} ({len(self.clients)} clients connected now)', 'red')

@@ -1,14 +1,61 @@
 #!/usr/bin/env python3
 
-from richsockets.Server import richserver as myserv
-import rich
+from richsockets.Server import richserver as serv
+from rich import print, inspect
+import argparse
 
-rich.inspect(myserv.Server(myserv.get_dev_ip(), 8000))
-# rich.inspect(rich.inspect, all = True)
-# rich.Confirm().ask('R u ok ?')
+parser = argparse.ArgumentParser(
+    formatter_class = argparse.RawDescriptionHelpFormatter,
+    description = '''│ Myserver \033[4mclient side\033[0m script to interract with the socket server structure
+│ in MyServerModule.py. Any available command to interract with the server
+│ is provided in the CLI help utility to be invoked using h cmd ...''',
+    epilog = 'Author : Pawlicki Loïc\n' + '─'*30 + '\n')
+
+parser.add_argument('-d', '--delay', 
+                    default = .3, 
+                    type = float, 
+                    metavar = '',
+                    action= 'store',
+                    help = '\tDelay to be passed to fake_process')
+
+parser.add_argument('-r', '--res', 
+                    default = 2000, 
+                    type = int, 
+                    metavar = '',
+                    action= 'store',
+                    help = 'Iterations to be passed to fake_process')
+
+parser.add_argument('-p', '--path', 
+                    default = 'DataBase', 
+                    type = str, 
+                    metavar = '',
+                    action= 'store',
+                    help = 'Path to be passed to tree tests')
+
+parser.add_argument('-ip', '--ipserv', 
+                    default = serv.get_dev_ip(), 
+                    type = str, 
+                    metavar = '',
+                    action= 'store',
+                    help = 'Server IPV4 adress to target')
+
+parser.add_argument('-port', '--port',
+                    default = 8000, 
+                    type = int, 
+                    metavar = '',
+                    action= 'store',
+                    help = 'Server port num to target')
+
+args = parser.parse_args()
+# parser.print_help()
+for arg in vars(args): print(arg, '\t─\t', getattr(args, arg))
+
+
+inspect(serv.Server(serv.get_dev_ip(), 8000))
+
 if __name__ == '__main__':
 
-    myserv.header()
+    serv.header()
 
-    server = myserv.Server(myserv.get_dev_ip(), 8000)
+    server = serv.Server(serv.get_dev_ip(), 8000)
     server.serve(5)

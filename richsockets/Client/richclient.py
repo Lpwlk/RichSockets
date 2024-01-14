@@ -1,38 +1,37 @@
 #!/usr/bin/env python3
 
-import os
-import sys
-import time
-import socket
-import struct
-import hashlib
-import threading
-from tqdm import tqdm
-from datetime import datetime
-from mytools import bprint, cprint
-import numpy as np
-import directory_tree as dtree
 from richsockets.utils import *
+import struct
+import threading
+import hashlib
 
 class Client:
-    ''' Client object to be called after importing richsockets package
+    ''' 
+    Client object to be called after importing richsockets package.
     '''
-    def __init__(self, host, port):
-        '''__init__ _summary_
-        Args:
-            host (_type_): _description_
-            port (_type_): _description_
-        '''
+    def __init__(self, host: str = socket.gethostbyname(socket.gethostname()), port: int = 8000, color: str = 'white', ID: str = hex(2**16-1),):
+        # '''__init__ 
+        # Self client attributes are defined after connection to remote 
+        # hosts except port & ip addr required for connection.
+        
+        # Args:
+        #     host (str, optional): remote server's IP adress. Defaults to socket.gethostbyname(socket.gethostname()).
+        #     port (int, optional): TCP port number. Defaults to 8000.
+
         self.host = host
         self.port = port
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.log = None
         self.logpath = None
-        self.color = None
+        self.color = color
         self.ID = None
 
     def connect(self):
-        '''connect _summary_
+        '''Client.connect() 
+        Client connection routine including logging init, authentification if
+        remote server is in secured mode and attributes reception from host.
+        Args:
+            None
         '''
         self.client_socket.connect((self.host, self.port))
         self.ID = hex(np.random.randint(0,2**16-1))
@@ -46,7 +45,11 @@ class Client:
         get_socket_details(self.client_socket, color = self.color, clientID = self.ID, verbose = 1)
     
     def close(self):
-        '''close _summary_
+        '''Client.close() 
+        Client disconnect routine: closing logging handlers and 
+        sending disconnect request to current host.
+        Args:
+            None
         '''
         self.log.info('Client socket closing after sending disconnect request.')
         self.send('disconnect')
@@ -60,7 +63,7 @@ class Client:
     def send(self, 
              data,
              verbose = 1):
-        '''send _summary_
+        '''send Send routine, Deprecated, prefer to use directly self.client_socket.send(_.encode())
 
         Args:
             data (_type_): _description_
@@ -151,14 +154,14 @@ class Client:
         self.client_socket.send(msg.encode())
     
     def get_temp(self):
-        '''get_temp _summary_
+        '''Client.get_temp() 
         '''
         self.send('server_temp')
         temp = float(self.receive())
         cprint(f'\t> Server CPU temp is {temp} °C', self.color)
     
     def ping_server(self):
-        '''ping_server _summary_
+        ''' Client.ping_server() 
         '''
         time.sleep(.1)
         t_ping = time.time()

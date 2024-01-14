@@ -1,2 +1,14 @@
-10:45:14 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
-10:45:23 - client_log - INFO - Received input : st
+03:29:01 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
+03:29:03 - client_log - INFO - Received input : t
+03:29:03 - client_log - INFO - Client sent : server_temp
+03:29:07 - client_log - INFO - Received input : st
+03:29:07 - client_log - INFO - Client sent : stream,3,4,0,1,200
+03:29:07 - client_log - WARNING - Exception occurend in ext. client loop : name 'struct' is not defined
+03:29:08 - client_log - INFO - Received input : e
+03:29:08 - client_log - ERROR - Unknown user input in client command loop
+03:29:08 - client_log - INFO - Received input : r
+03:29:08 - client_log - ERROR - Unknown user input in client command loop
+03:29:09 - client_log - INFO - Received input : ebsqbe
+03:29:09 - client_log - ERROR - Unknown user input in client command loop
+03:29:31 - client_log - INFO - Client socket closing after sending disconnect request.
+03:29:31 - client_log - INFO - Client sent : disconnect
