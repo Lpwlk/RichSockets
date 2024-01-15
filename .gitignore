@@ -1,2 +1,11 @@
 # ignore log folders
 **/Logs
+
+# ignore dump folder
+**/dump
+
+# ignore pycache folders
+**/__pycache__
+
+# ignore python tess folders
+/pytest.py
