@@ -2,4 +2,4 @@
 /richsockets/Client/DataBase/Logs/*.log
 
 # ignore logs in Server sub-package
-/richsockets/Server/DataBase/Logs/*.log
+richsockets/Server/DataBase/Logs*.log
