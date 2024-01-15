@@ -2,7 +2,10 @@
 
 from richsockets.Server import richserver as rc
 from richsockets.Server.richserver import print, inspect, console
+
 rc.header()
+
+
 
 import argparse
 
@@ -12,35 +15,30 @@ parser = argparse.ArgumentParser(
 │ in MyServerModule.py. Any available command to interract with the server
 │ is provided in the CLI help utility to be invoked using h cmd ...''',
     epilog = 'Author : Pawlicki Loïc\n' + '─'*30 + '\n')
-
 parser.add_argument('-d', '--delay', 
                     default = .3, 
                     type = float, 
                     metavar = '',
                     action= 'store',
                     help = '\tDelay to be passed to fake_process')
-
 parser.add_argument('-r', '--res', 
                     default = 2000, 
                     type = int, 
                     metavar = '',
                     action= 'store',
                     help = 'Iterations to be passed to fake_process')
-
 parser.add_argument('-p', '--path', 
                     default = 'DataBase', 
                     type = str, 
                     metavar = '',
                     action= 'store',
                     help = 'Path to be passed to tree tests')
-
 parser.add_argument('-ip', '--ipserv', 
                     default = rc.get_dev_ip(), 
                     type = str, 
                     metavar = '',
                     action= 'store',
                     help = 'Server IPV4 adress to target')
-
 parser.add_argument('-port', '--port',
                     default = 8000, 
                     type = int, 

@@ -1,5 +1,5 @@
-12:44:47 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
-12:44:48 - client_log - INFO - Client object received input command : t
-12:44:48 - client_log - INFO - Client sent : server_temp
-12:45:41 - client_log - INFO - Client socket closing after sending disconnect request.
-12:45:41 - client_log - INFO - Client sent : disconnect
+01:13:39 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
+01:13:39 - client_log - INFO - Client object received input command : t
+01:13:39 - client_log - INFO - Client sent : server_temp
+01:13:58 - client_log - INFO - Client socket closing after sending disconnect request.
+01:13:58 - client_log - INFO - Client sent : disconnect

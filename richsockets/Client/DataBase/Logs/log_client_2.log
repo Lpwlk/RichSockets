@@ -1,5 +1,11 @@
-12:46:09 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
-12:46:11 - client_log - INFO - Client object received input command : r
-12:46:11 - client_log - ERROR - Unknown user input in client command loop
-12:46:22 - client_log - INFO - Client socket closing after sending disconnect request.
-12:46:22 - client_log - INFO - Client sent : disconnect
+12:44:13 - client_log - INFO - Client connected to server ('192.168.1.12', 8000)
+12:44:14 - client_log - INFO - Client object received input command : t
+12:44:14 - client_log - INFO - Client sent : server_temp
+12:44:38 - client_log - INFO - Client object received input command : f
+12:44:38 - client_log - ERROR - Unknown user input in client command loop
+12:44:54 - client_log - INFO - Client object received input command : op
+12:44:54 - client_log - ERROR - Unknown user input in client command loop
+12:45:01 - client_log - INFO - Client object received input command : oppop
+12:45:01 - client_log - ERROR - Unknown user input in client command loop
+12:45:06 - client_log - INFO - Client object received input command : t
+12:45:06 - client_log - INFO - Client sent : server_temp

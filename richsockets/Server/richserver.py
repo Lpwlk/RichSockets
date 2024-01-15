@@ -5,6 +5,11 @@ import struct
 import threading
 import hashlib
 
+from rich.console import Group
+from rich.panel import Panel
+from rich.align import Align
+from rich.prompt import Prompt, Confirm
+
 class Server:
     def __init__(self, host, port):
         '''Server() Server object to call after richsockets import. It includes a front-end
@@ -120,7 +125,6 @@ class Server:
     def handle_client(self, client_socket, color, clientID):
         
         self.log.info(f' └── Client thread started for client {client_socket.getpeername()}')
-        
         get_client_details(client_socket, verbose = 1)
 
         while True:
@@ -186,6 +190,7 @@ class Server:
 
                     case _ :
                         console.print('Unknown request received', style = 'bold red')
+                process(5, 1000)
                 # match request end
                         
             except Exception as e:

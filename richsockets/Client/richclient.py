@@ -4,6 +4,7 @@ from richsockets.utils import *
 import struct
 import threading
 import hashlib
+from rich.prompt import Prompt
 
 class Client:
     
@@ -19,15 +20,18 @@ class Client:
             color (str, optional): _description_. Defaults to 'white'.
             ID (str, optional): _description_. Defaults to hex(2**16-1).
         '''
-        
-        self.host = host
-        self.port = port
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.color = None
-        self.ID = None
-        self.log = None
+        self.host: str = host
+        self.port: int = port
+        self.client_socket: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.color: str= None
+        self.ID: str = None
+        self.log  = None
         self.logpath = 'white'
 
+    def get_command(self):
+        inp = Prompt.ask('[bold green]Client command', default = 'h', show_default=False)
+        self.log.info(f'Client object received input command : {inp}')
+        return inp
     def connect(self):
         '''Client.connect() 
         Client connection routine including logging init, authentification if
@@ -77,7 +81,7 @@ class Client:
         frame = f'{data}'
         self.client_socket.send(frame.encode())
         self.log.info(f'Client sent : {frame}')
-        if verbose: console.print(f'\tSending data to {self.client_socket.getpeername()} : {frame}', self.color)
+        if verbose: console.print(f'\tSending data to {self.client_socket.getpeername()} : {frame}', style = self.color)
         
     def receive(self, n_bytes = 1024, verbose = 1):
         '''receive _summary_
@@ -90,7 +94,7 @@ class Client:
             _type_: _description_
         '''
         data = self.client_socket.recv(n_bytes)
-        if verbose: console.print(f'\tReceived data from {self.client_socket.getpeername()} : {data}', self.color)
+        if verbose: console.print(f'\tReceived data from {self.client_socket.getpeername()} : {data}', style = self.color)
         return data 
     
     def check_sha(self, sent_frame, verbose = 0):

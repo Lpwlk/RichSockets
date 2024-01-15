@@ -11,8 +11,10 @@ from rich import print, inspect
 import rich.rule as rule
 import rich.table as table
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
-
+from rich.live import Live
+from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
+from rich.table import Table
 
 console = Console(highlighter = None)
 
@@ -40,26 +42,57 @@ def get_dev_ip(verbose: bool = False):
     return ip
 
 def process(delay: float = 1, res: int = 1000):
-    with Progress(
-        SpinnerColumn(), 
-        *Progress.get_default_columns(), 
-        TimeElapsedColumn(),
-        console=console,
-        transient=False, 
-        ) as progress:
-        start_time = progress.get_time()
-        task1 = progress.add_task("Process 1", total=res)
-        task2 = progress.add_task("Process 2", total=res)
-        task3 = progress.add_task("Process 3", total=None)
-        while not progress.finished:
-            progress.update(task1, advance=1)
-            progress.update(task2, advance=1)
-            time.sleep(delay/res)
-            if progress.get_time() - start_time > delay:
-                print('test')
-                progress.update(task3, completed = True)
-        #     progress.update(task1)
-        #     time.sleep(delay/res)
+    # with Progress(
+    #     SpinnerColumn(), 
+    #     *Progress.get_default_columns(), 
+    #     TimeElapsedColumn(),
+    #     console=console,
+    #     transient=False, 
+    #     ) as progress:
+    #     start_time = progress.get_time()
+    #     task1 = progress.add_task("Process 1", total=res)
+    #     task2 = progress.add_task("Process 2", total=res)
+    #     task3 = progress.add_task("Process 3", total=None)
+    #     while not progress.finished:
+    #         progress.update(task1, advance=1)
+    #         progress.update(task2, advance=1)
+    #         time.sleep(delay/res)
+    #         if progress.task_ids:
+    #             time.sleep(delay)
+    #             progress.update(task3, total = 1, completed = 1)
+    from time import sleep
+
+    job_progress = Progress(
+        "{task.description}",
+        SpinnerColumn(),
+        BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        console = console
+    )
+    job1 = job_progress.add_task("[green]Cooking", total=None)
+    job2 = job_progress.add_task("[magenta]Baking", total=res)
+    job3 = job_progress.add_task("[cyan]Mixing", total=2*res)
+
+    total = sum(task.total if task.total is not None else 0 for task in job_progress.tasks)
+    overall_progress = Progress()
+    overall_task = overall_progress.add_task("All Jobs", total=int(total))
+
+    progress_table = Table.grid()
+    progress_table.add_row(
+        Panel.fit(
+            overall_progress, title="Overall Progress", border_style="green", padding=(2, 2)
+        ),
+        Panel.fit(job_progress, title="[b]Jobs", border_style="red", padding=(1, 2)),
+    )
+
+    with Live(progress_table, refresh_per_second=10):
+        while not overall_progress.finished:
+            sleep(delay/res)
+            for job in job_progress.tasks:
+                if not job.finished:
+                    job_progress.advance(job.id)
+            completed =  sum(task.completed if task.total is not None else 0 for task in job_progress.tasks)
+            overall_progress.update(overall_task, completed=completed)
 
 
 def get_client_details(tcp_socket = socket.socket, detailed: bool = False, verbose: bool = True,):

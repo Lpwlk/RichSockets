@@ -53,16 +53,6 @@ args = parser.parse_args()
 for arg in vars(args): print(arg, '\t─\t', getattr(args, arg))
 # parser.print_help()
 
-grp = Group(
-    Align(Panel("Hello", style="bold blue", expand = False, ), align='center'),
-    Align(Panel("World", style="italic red"), align='center')
-)
-
-grp2 = Group(
-    Panel("Hello", style="bold blue", expand = False,),
-    Panel("World", style="italic red")
-)
-
 # print(Align(Panel(grp), align='center'))
 # print(Panel(grp2))
 
@@ -75,8 +65,7 @@ if __name__ == '__main__':
     
     while True:
         try:
-            inp = Prompt.ask('[bold green]Client command', default = 'h', show_default=False)
-            client.log.info(f'Client object received input command : {inp}')
+            inp = client.get_command()
             match inp:
                 case 'h': 
                     rc.client_help()
