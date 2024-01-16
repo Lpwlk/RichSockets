@@ -5,11 +5,6 @@ import struct
 import threading
 import hashlib
 
-from rich.console import Group
-from rich.panel import Panel
-from rich.align import Align
-from rich.prompt import Prompt, Confirm
-
 class Server:
     def __init__(self, host, port):
         '''Server() Server object to call after richsockets import. It includes a front-end
@@ -171,7 +166,7 @@ class Server:
                         self.send_sha(client_socket, recv_content, color)
                     case b'stream':
                         stream_specs = request.split(b',')
-                        channel, buf_len, n_packet, verbose, delay = [int(stream_specs[i]) for i in range(1, 6)]
+                        channel, buf_len, n_packet, verbose, delay = [int(stream_specs[i]) for i in range(1, len(stream_specs)-1)]
                         stream_cnt = 0
                         flag = 1
                         if n_packet == 0:                     

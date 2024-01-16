@@ -18,6 +18,10 @@ from rich.table import Table
 
 console = Console(highlighter = None)
 
+###############################################################
+################### General usage functions ###################
+###############################################################
+
 def header():
     console.print(rule.Rule(style = 'white'))
     header = table.Table(
@@ -42,25 +46,6 @@ def get_dev_ip(verbose: bool = False):
     return ip
 
 def process(delay: float = 1, res: int = 1000):
-    # with Progress(
-    #     SpinnerColumn(), 
-    #     *Progress.get_default_columns(), 
-    #     TimeElapsedColumn(),
-    #     console=console,
-    #     transient=False, 
-    #     ) as progress:
-    #     start_time = progress.get_time()
-    #     task1 = progress.add_task("Process 1", total=res)
-    #     task2 = progress.add_task("Process 2", total=res)
-    #     task3 = progress.add_task("Process 3", total=None)
-    #     while not progress.finished:
-    #         progress.update(task1, advance=1)
-    #         progress.update(task2, advance=1)
-    #         time.sleep(delay/res)
-    #         if progress.task_ids:
-    #             time.sleep(delay)
-    #             progress.update(task3, total = 1, completed = 1)
-    from time import sleep
 
     job_progress = Progress(
         "{task.description}",
@@ -69,6 +54,7 @@ def process(delay: float = 1, res: int = 1000):
         TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
         console = console
     )
+    
     job1 = job_progress.add_task("[green]Cooking", total=None)
     job2 = job_progress.add_task("[magenta]Baking", total=res)
     job3 = job_progress.add_task("[cyan]Mixing", total=2*res)
@@ -87,7 +73,7 @@ def process(delay: float = 1, res: int = 1000):
 
     with Live(progress_table, refresh_per_second=10):
         while not overall_progress.finished:
-            sleep(delay/res)
+            time.sleep(delay/res)
             for job in job_progress.tasks:
                 if not job.finished:
                     job_progress.advance(job.id)
@@ -112,9 +98,11 @@ def get_client_details(tcp_socket = socket.socket, detailed: bool = False, verbo
             console.print(f'{key} {str(socket_info[key])}')
     return None
 
+
 ###############################################################
 ############### Client side rich-based routines ###############
 ###############################################################
+
 
 def client_help():
     console.print(rule.Rule(style = 'white'), width = 80)
@@ -150,9 +138,11 @@ def init_client_log(log_num, verbose = 0, stream=0):
     if stream: client_log.addHandler(streamHandler)
     return client_log, log_path
 
+
 ###############################################################
 ############### Server side rich-based routines ###############
 ###############################################################
+
 
 def server_help():
     console.print(rule.Rule(style = 'white'), width = 80)

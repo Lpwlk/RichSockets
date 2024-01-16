@@ -32,6 +32,7 @@ class Client:
         inp = Prompt.ask('[bold green]Client command', default = 'h', show_default=False)
         self.log.info(f'Client object received input command : {inp}')
         return inp
+    
     def connect(self):
         '''Client.connect() 
         Client connection routine including logging init, authentification if
@@ -179,12 +180,6 @@ class Client:
         console.print(f'\t> {pong} received : took {round(1000*(time.time()-t_ping), 4)} ms', style = self.color)
 
     def stream_channel(self, channel: int = 3, delay: int = 200, buf_len: int = 4, n_packet: int = 0, save_txt: int = 1, verbose: int = 1):
-        # channel = valid_input('Enter channel number > Ch n°', bounds = [1, 3], input_trigger = channel)
-        # delay = valid_input('Enter serv side delay for streaming session (ms) > ', bounds = [1, 10000], input_trigger = delay)
-        # buf_len = valid_input('Enter buffer_length for streaming session > ', bounds = [1, 64], input_trigger = buf_len)
-        # n_packet = valid_input('Enter n_packet for streaming session > ', bounds = [0, 1e9], input_trigger = n_packet)
-        # save_txt = valid_input('Enter 1 to save data in a txt file (save_txt flag) > ', bounds = [0, 1], input_trigger = save_txt)
-        # verbose = valid_input('Enter 1 to display data in stdout (verbose flag) > ', bounds = [0, 1], input_trigger = verbose)
         channel_path =os.getcwd()+'/'+f'richsockets/Client/DataBase/StreamData/data_channel_{channel}.txt'
         with open(channel_path, mode = 'a') as f: 
             f.truncate(0); f.close()
