@@ -7,4 +7,5 @@ users_logs.txt
 # Various sandbox files for implementation tests
 
 dump
-template
+template.py
+test.py
