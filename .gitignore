@@ -1,4 +1,10 @@
+# Server & client files
+
 Logs
 StreamData
 users_logs.txt
+
+# Various sandbox files for implementation tests
+
 dump
+template
