@@ -2,6 +2,10 @@
 
 users_logs.txt
 
+# Iterm2 API for debug purposes
+
+iterm2.py
+
 # Various sandbox files for implementation tests
 
 dump

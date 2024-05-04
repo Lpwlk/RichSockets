@@ -50,6 +50,30 @@ class ResponseCodes:
     NOK = b'03'
     AUTHFAILED = b'04'
 
+class Sounds:
+    ATB = 'AttachmentBegin.aiff'
+    ATE = 'AttachmentEnd.aiff'
+    B1 = 'Beacon_1.aiff'
+    B2 = 'Beacon_2.aiff'
+    B3 = 'Beacon_3.aiff'
+    B4 = 'Beacon_4.aiff'
+    BL = 'Blow.aiff'
+    BO = 'Bottle.aiff'
+    BP = 'BubblePop.aiff'
+    BD = 'BubbleDepop.aiff'
+    EB = 'ElementBorder.aiff'
+    EBH = 'ElementBorderHit.aiff'
+    FR = 'Frog.aiff'
+    GL = 'Glass.aiff'
+    IN = 'Invitation.aiff'
+    LB = 'LinkBegin.aiff'
+    LE = 'LinkEnd.aiff'
+    PR = 'PointReached.aiff'
+    PA = 'PopupAppeared.aiff'
+    SE = 'Sent.aiff'
+    SC = 'SingleClick.aiff'
+    TI = 'Tink.aiff'
+    
 def translateRequest(code: bytes) -> str:
     for attr, val in RequestCodes.__dict__.items():
         if code == val: return attr
@@ -57,7 +81,6 @@ def translateRequest(code: bytes) -> str:
 def translateResponse(code: bytes) -> str:
     for attr, val in ResponseCodes.__dict__.items(): 
         if code == val: return attr
-
 
 ################### General usage functions ###################
 
@@ -76,13 +99,7 @@ def say(msg: str, voice: str = 'Samantha', rate: int = 160, vol: float = 0.5) ->
     os.system(f'say [\\[volm {vol}]] {msg} -v {voice} -r {rate}')
 
 def notif(fname: str = 'Blow') -> None:
-    os.system(f'afplay {os.path.dirname(__file__)}/SoundLib/{fname}')
-
-notifs = sorted(os.listdir(f'{os.path.dirname(__file__)}/SoundLib/'))
-print(notifs)
-for snd in notifs:
-    console.print(snd, style = 'bright_blue')
-    notif(fname = snd)
+    os.system(f'afplay {os.path.dirname(__file__)}/Sound/{fname}')
 
 def get_dev_ip(verbose: bool = False) -> str:
     ip = socket.gethostbyname(socket.gethostname())
@@ -147,6 +164,7 @@ def get_threading_table() -> None:
         threads_table.add_row(thread.name)
     console.print(threads_table)
 
+
 ############### Client side rich-based routines ###############
 
 def client_help() -> None:
@@ -163,7 +181,6 @@ def client_help() -> None:
     help.add_row("'h'",    "Display client-side help",             "dev_state")
     help.add_row("'p'",    "Ping server thread",                   "dev_state")
     help.add_row("'t'",    "Get server CPU temp",                  "dev_state")
-    help.add_row("'b'",    "Broadcast data to available clients",  "dev_state")
     help.add_row("'st'",   "Send file to server database",         "dev_state")
     help.add_row("'cl'",   "Close current client socket",          "dev_state")
     help.add_row("'co'",   "Open new client socket",               "dev_state")
@@ -175,7 +192,8 @@ def init_client_log(log_num, show_path: bool = True, stream: bool = False) -> tu
     client_log = logging.getLogger('client_log')
     client_fileHandler = logging.FileHandler(filename = log_path, mode = 'w'); streamHandler = logging.StreamHandler()
     client_log.setLevel(logging.DEBUG); client_fileHandler.setLevel(logging.DEBUG); streamHandler.setLevel(logging.DEBUG)
-    fmt = logging.Formatter(fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt = '%I:%M:%S')
+    # fmt = logging.Formatter(fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt = '%I:%M:%S')
+    fmt = logging.Formatter(fmt = '%(asctime)s %(levelname)s | %(message)s', datefmt = '%I:%M:%S')
     client_fileHandler.setFormatter(fmt); streamHandler.setFormatter(fmt)
     client_log.addHandler(client_fileHandler)
     if stream: client_log.addHandler(streamHandler)
@@ -185,8 +203,8 @@ def client_argparse(verbose: bool = True, help: bool = False) -> argparse.Namesp
     parser = argparse.ArgumentParser(
         formatter_class = argparse.RawDescriptionHelpFormatter,
         description = '''│ Myserver \033[4mclient side\033[0m script to interract with the socket server structure
-    │ in MyServerModule.py. Any available command to interract with the server
-    │ is provided in the CLI help utility to be invoked using h cmd ...''',
+│ in RichSockets package. Any available command to interract with the server
+│ is provided in the CLI help utility to be invoked using h cmd ...''',
         epilog = 'Author : Pawlicki Loïc\n' + '─'*30 + '\n')
     parser.add_argument('-d', '--delay', 
                         default = 1, type = float, 
@@ -217,6 +235,7 @@ def client_argparse(verbose: bool = True, help: bool = False) -> argparse.Namesp
     return args
 
 
+
 ############### Server side rich-based routines ###############
     
 def init_server_log(show_path: bool = True, stream: bool = False) -> logging.Logger:
@@ -234,9 +253,8 @@ def init_server_log(show_path: bool = True, stream: bool = False) -> logging.Log
 def server_argparse(verbose: bool = True, help: bool = False) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         formatter_class = argparse.RawDescriptionHelpFormatter,
-        description = '''│ Myserver \033[4mclient side\033[0m script to interract with the socket server structure
-    │ in MyServerModule.py. Any available command to interract with the server
-    │ is provided in the CLI help utility to be invoked using h cmd ...''',
+        description = '''│ Myserver \033[4mserver side\033[0m script to interract with the socket client objects
+│ in RichSockets package.''',
         epilog = 'Author : Pawlicki Loïc\n' + '─'*30 + '\n')
     parser.add_argument('-d', '--delay', 
                         default = 1, type = float, 
@@ -261,7 +279,7 @@ def server_argparse(verbose: bool = True, help: bool = False) -> argparse.Namesp
     parser.add_argument('-auth', '--auth',
                     default = True, type = bool, 
                     metavar = '', action= 'store',
-                    help = 'Authentification flag')
+                    help = 'Authentification flag to set server accessibility')
     args = parser.parse_args()
     if verbose: 
         for arg in vars(args): console.print(arg, '\t─\t', getattr(args, arg))

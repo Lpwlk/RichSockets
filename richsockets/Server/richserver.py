@@ -33,8 +33,7 @@ class Server:
                 self.panel.title = f'[blue]Connected clients: {len(self.clients)} | Time since server boot: {int((time.time()-self.boot_time)//3600)}:{int((time.time()-self.boot_time)//60)}:{(time.time()-self.boot_time)%60:.2f}[/blue]'
 
     def serve(self, max_client):
-        # footer_thread = threading.Thread(target = self.footer); footer_thread.start()
-        get_threading_table()
+        footer_thread = threading.Thread(target = self.footer); footer_thread.start()
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(max_client)
@@ -56,7 +55,7 @@ class Server:
                 console.print(f' └── Client {client_thread.name} started at {get_time()}', style = 'green')
                 self.log.info(f' └── Client thread started for client {client_socket.getpeername()}')
                 client_thread.start()
-                get_threading_table()
+                # get_threading_table()
             
             except KeyboardInterrupt:
                 console.print('\nKeyboard interrupt -> server threader closed', style = 'bold red')
@@ -119,25 +118,25 @@ class Server:
                 if logs[:-1] == client_logs: return True
                 else: console.print('Wrong login informations given', style = 'bold red'); return False
     
-    def send_response(self, client_socket: socket.socket, response: ResponseCodes) -> None:
+    def send_response(self, client_socket: socket.socket, response: ResponseCodes, verbose: bool = False, log: bool = True) -> None:
         client_socket.send(response)
-        console.print(f'Sent response [bold]{translateResponse(response)}[/bold] to {client_socket.getpeername()}')
-        self.log.info(f'Sent response {translateResponse(response)} to {client_socket.getpeername()}')
+        if verbose: console.print(f'Sent response [bold]{translateResponse(response)}[/bold] to {client_socket.getpeername()}')
+        if log: self.log.info(f'Sent response {translateResponse(response)} to {client_socket.getpeername()}')
 
-    def get_request(self, client_socket: socket.socket) -> bytes:
+    def get_request(self, client_socket: socket.socket, verbose: bool = False, log: bool = True) -> bytes:
         request = client_socket.recv(2)
-        console.print(f'Received request [bold]{translateRequest(request)}[/bold] from {client_socket.getpeername()}')
-        self.log.info(f'Received request {translateRequest(request)} from {client_socket.getpeername()}')
+        if verbose: console.print(f'Received request [bold]{translateRequest(request)}[/bold] from {client_socket.getpeername()}')
+        if log: self.log.info(f'Received request {translateRequest(request)} from {client_socket.getpeername()}')
         return request
             
-    def handle_request(self, client_socket: socket.socket):
+    def handle_request(self, client_socket: socket.socket, verbose: bool = False, log: bool = True):
         request = self.get_request(client_socket)
         if b'10'<=request<=b'80':
-            console.print(f'Request accepted', style = 'green')
-            self.log.info(f'Request accepted')
+            if verbose: console.print(f'Request accepted', style = 'green')
+            if log: self.log.info(f'Request accepted')
         else:
-            console.print('Request denied', style = 'red')
-            self.log.info('Request denied')
+            if verbose: console.print('Request denied', style = 'red')
+            if log: self.log.info('Request denied')
         return request
 
     def remove_client(self, client):
@@ -155,54 +154,10 @@ class Server:
                 match request:    
                     case RequestCodes.PING: 
                         self.send(client.socket, 'pong', client.color)
-                        
                     case RequestCodes.TEMP: 
                         self.send(client.socket, get_cpu_temp(), client.color)
-                    
-                    case RequestCodes.BROADCAST:
-                        console.print(f' > Client {client.socket.getsockname()} entered the chat room', style = client.color)
-                        broadcasted_data = client.socket.recv(1024)
-                        while broadcasted_data != b'q':
-                            self.broadcast(client.socket, broadcasted_data, client.color)
-                            broadcasted_data = client.socket.recv(1024)
-                            console.print(broadcasted_data)
-                        console.print(f' > Client {client.socket.getpeername()} exited the chat room', style = client.color)
-                    
                     case RequestCodes.ATTRS:
                         get_socket_attrs(client.socket)
-
-                    case RequestCodes.DOWNLOAD:
-                        dwnld_specs = request.split(b',')
-                        filesize, buf_len, dwn_path = int(dwnld_specs[1]), int(dwnld_specs[2]), 'DataBase/Downloads/'+dwnld_specs[3].decode()
-                        with open(dwn_path, 'wb') as f:
-                            n_bytes = 0
-                            while n_bytes < filesize:
-                                bytes_read = client.socket.recv(buf_len)
-                                n_bytes += len(bytes_read)
-                                f.write(bytes_read)
-                        recv_content = open(dwn_path, 'rb').read()
-                        self.send(client.socket, sha256(recv_content), client.color)
-                    
-                    # case RequestCodes.STREAM:
-                    #     stream_specs = client.socket.recv(1024).decode().split(',')
-                    #     console.print(stream_specs)
-                    #     channel, buf_len, n_packet, verbose, delay = [int(spec) for spec in stream_specs]
-                    #     stream_cnt = 0
-                    #     flag = 1
-                    #     if n_packet == 0:                     
-                    #         interrupt_thread = threading.Thread(target=client.socket.recv, args=(64,))
-                    #         interrupt_thread.start()
-                    #     t_start = time.time()
-                    #     while flag:
-                    #         data = self.update_packet(channel, verbose, buf_len, stream_cnt, client.color)
-                    #         client.socket.send(data)
-                    #         stream_cnt += 1
-                    #         time.sleep(delay/1000)
-                    #         if n_packet == 0: flag = interrupt_thread.is_alive()
-                    #         else: flag = (stream_cnt != n_packet)
-                    #     console.print(f'Data streaming on channel n°{channel} closed, {stream_cnt} packets have been sent to {client.socket.getpeername()}', style = client.color)
-                    #     console.print(f'Elapsed time in server streaming loop : {round((time.time()-t_start), 6)} s', style = client.color)
-                    
                     case RequestCodes.DISCONNECT:
                         self.remove_client(client)
                         break
@@ -211,7 +166,6 @@ class Server:
                         self.log.info(f'Received shutdown request from client {client.socket.getpeername()}  ({len(self.clients)}, server shuting down')
                         self.server_socket.close()
                         break
-                    
                     case _ :
                         console.print('Unknown request received', style = 'bold red')
         else: return False
@@ -235,18 +189,3 @@ class Server:
         for client in self.clients: 
             client.send(data)
     
-    def update_packet(self, channel, verbose, buf_len, cnt, color):
-        if channel == 1:
-            arr = np.random.randint(0, 1000, size = buf_len)
-            packet = struct.pack(f'{buf_len}i', *arr)
-        elif channel == 2:
-            arr = np.random.normal(loc=0, scale=1, size = buf_len)
-            for i in range(len(arr)): arr[i] = round(arr[i], 4)
-            packet = struct.pack(f'{buf_len}d', *arr)
-        elif channel == 3:
-            x = np.linspace(cnt, cnt+1, buf_len)
-            arr = [np.sin(i*cnt/100) for i in x]
-            packet = struct.pack(f'{buf_len}d', *arr)
-        if verbose: 
-            console.print(" ".join(map(str, arr)), style = color)
-        return packet
