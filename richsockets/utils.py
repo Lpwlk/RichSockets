@@ -1,36 +1,40 @@
-import sys, time
-import random
-import struct
-import threading
+import argparse
 import hashlib
-import os
-import numpy as np
-import socket
 import logging
+import os
 import platform
-import mactemperatures
+import random
+import socket
+import struct
+import sys
+import threading
+import time
 from datetime import datetime
+
+import mactemperatures
+from rich.rule import Rule
 from rich import inspect, print
-import rich.rule as rule
-import rich.table as table
 from rich.console import Console
 from rich.live import Live
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
-from rich.table import Table
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.prompt import Prompt
-import argparse
+from rich.table import Table
 
-console = Console()
+console = Console(
+    highlight = True,
+    log_path = False,
+)
+
 server_colors = ['blue','green','yellow','magenta','white']
 
-###################    Request codes     ###################
+############  Requests & Responses codes and translations routines  ############
 
 class RequestCodes:
     AUTH = b'00'
     LOGIN = b'01'
     REGISTER = b'02'
-    DEVBYPASS = b'03'
+    AUTHBP = b'03'
     PING = b'10'
     TEMP = b'20'
     BROADCAST = b'30'
@@ -40,8 +44,6 @@ class RequestCodes:
     UPLOAD = b'70'
     DISCONNECT = b'80'
     SHUTDOWN = b'90'
-
-###################    Response codes    ###################
  
 class ResponseCodes:
     NAUTH = b'00'
@@ -49,6 +51,14 @@ class ResponseCodes:
     OK = b'02'
     NOK = b'03'
     AUTHFAILED = b'04'
+    
+def translateRequest(code: bytes) -> str:
+    for attr, val in RequestCodes.__dict__.items():
+        if code == val: return attr
+        
+def translateResponse(code: bytes) -> str:
+    for attr, val in ResponseCodes.__dict__.items(): 
+        if code == val: return attr
 
 class Sounds:
     ATB = 'AttachmentBegin.aiff'
@@ -73,27 +83,21 @@ class Sounds:
     SE = 'Sent.aiff'
     SC = 'SingleClick.aiff'
     TI = 'Tink.aiff'
-    
-def translateRequest(code: bytes) -> str:
-    for attr, val in RequestCodes.__dict__.items():
-        if code == val: return attr
-        
-def translateResponse(code: bytes) -> str:
-    for attr, val in ResponseCodes.__dict__.items(): 
-        if code == val: return attr
 
 ################### General usage functions ###################
 
 def header(color: str = 'yellow', lcolor: str = 'white') -> None:
-    console.print(rule.Rule(style = lcolor))
-    header = table.Table(title='Python script execution init ...', title_justify='center', border_style=lcolor, min_width=60, expand=True)
+    # inspect(platform.uname())
+    console.print(Rule(style = lcolor))
+    header = Table(title='Python script execution init ...', title_justify='center', border_style=lcolor, min_width=60, expand=True)
     header.add_column('Variable', style=color, header_style='bold '+color)
     header.add_column('Variable states', style='italic '+color, header_style='bold '+color)
-    header.add_row('node.name',  f'{platform.uname().node} (OS: {platform.uname().system})')
-    header.add_row('sys.argv',   f'{repr(sys.argv)}')
-    header.add_row('sys.path',   f'{sys.path[0]}')
+    header.add_row('node.name', f'{platform.uname().node} (OS: {platform.uname().system})')
+    header.add_row('Arg values', f'{repr(sys.argv)}')
+    header.add_row('File path', f'{sys.path[0]}')
+    header.add_row('Python version',   f'{platform.python_version()}')
     console.print(header, justify = 'center')
-    console.print(rule.Rule(style = lcolor))
+    console.print(Rule(style = lcolor))
 
 def say(msg: str, voice: str = 'Samantha', rate: int = 160, vol: float = 0.5) -> None:
     os.system(f'say [\\[volm {vol}]] {msg} -v {voice} -r {rate}')
@@ -168,8 +172,8 @@ def get_threading_table() -> None:
 ############### Client side rich-based routines ###############
 
 def client_help() -> None:
-    console.print(rule.Rule(style = 'white'), width = 80)
-    help = table.Table(
+    console.print(Rule(style = 'white'), width = 80)
+    help = Table(
         title=" > [underline]Client help utility : every available client commands are indexed here",
         title_justify = "left",
         border_style="white",
@@ -234,8 +238,6 @@ def client_argparse(verbose: bool = True, help: bool = False) -> argparse.Namesp
         parser.print_help()   
     return args
 
-
-
 ############### Server side rich-based routines ###############
     
 def init_server_log(show_path: bool = True, stream: bool = False) -> logging.Logger:
@@ -244,7 +246,7 @@ def init_server_log(show_path: bool = True, stream: bool = False) -> logging.Log
     server_log = logging.getLogger('server_log')
     server_fileHandler = logging.FileHandler(filename = log_path, mode = 'w'); streamHandler = logging.StreamHandler()
     server_log.setLevel(logging.DEBUG); server_fileHandler.setLevel(logging.DEBUG); streamHandler.setLevel(logging.DEBUG)
-    fmt = logging.Formatter(fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(threadName)s)', datefmt = '%I:%M:%S')
+    fmt = logging.Formatter(fmt = '%(asctime)s %(levelname)s (%(threadName)s) | %(message)s', datefmt = '%I:%M:%S')
     server_fileHandler.setFormatter(fmt); streamHandler.setFormatter(fmt)
     server_log.addHandler(server_fileHandler)
     if stream: server_log.addHandler(streamHandler)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from richsockets.utils import *
 
+
 class Client:
     def __init__(self, host: str = socket.gethostbyname(socket.gethostname()), port: int = 8000, color: str = 'white'):
         self.host: str = host
@@ -30,12 +31,12 @@ class Client:
                                         
             else: self.close()
         except KeyboardInterrupt:
-            console.print('[bold red]Keyboard interrupt -> Client socket closing ...')
+            console.print('[bold red]Keyboard interrupt → Client socket closed')
             self.close()
         
     def get_command(self):
-        inp = Prompt.ask('[bold green]Client command', default = 'h', show_default=True)
-        self.log.info(f'Client object received input command : {inp}')
+        inp = Prompt.ask('[bold green]Client command', console = console)
+        self.log.info(f'Client instance recieved command : {inp}')
         return inp
     
     def connect(self):
@@ -63,7 +64,7 @@ class Client:
                 self.send_request(RequestCodes.REGISTER)
                 return self.register()
             elif mode == 'b':
-                self.send_request(RequestCodes.DEVBYPASS)
+                self.send_request(RequestCodes.AUTHBP)
                 return True
             
     def login(self):
